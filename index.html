@@ -1,0 +1,60 @@
+# Create an HTML file with the embedded fundraising thermometer and Google Sheets CSV integration
+
+html_content = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Fundraiser Thermometer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    #fundraising-thermometer-576 {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Our Fundraising Progress</h1>
+  <svg id="fundraising-thermometer-576" width="800" height="1050"></svg>
+
+  <script>
+    fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vRV75UzZ1XLnKy8mYAlyoo_R9-sR1WS1U3gmCIG-YkKoEGARHiIRmYYgu18kVxYtQnGqHQyXIWqC3xB/pub?output=csv")
+      .then(response => response.text())
+      .then(csv => {
+        const [headers, values] = csv.trim().split('\\n');
+        const [goal, progress] = values.split(',');
+
+        const thermometerConfig = {
+          layout: "1",
+          "fill-color": "rgba(42, 130, 33, 1)",
+          "goal-amount": goal,
+          "progress-amount": progress,
+          "show-goal-amount": "1",
+          "show-progress-percentage": "1",
+          "show-progress-amount": "1",
+          "animate-progress-fill": "1"
+        };
+
+        const script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = "https://d22knjn4n6hjqd.cloudfront.net/thermometer/embed.js";
+        script.setAttribute("for", "fundraising-thermometer-576");
+
+        window["fundraising_thermometer_576"] = thermometerConfig;
+        document.body.appendChild(script);
+      });
+  </script>
+</body>
+</html>
+'''
+
+# Save to file
+file_path = "/mnt/data/fundraiser_thermometer.html"
+with open(file_path, "w") as file:
+    file.write(html_content)
+
+file_path
